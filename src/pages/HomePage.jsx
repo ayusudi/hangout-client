@@ -1,64 +1,68 @@
-import background from "../assets/background.png"
+import React from "react";
+import hangout from "../assets/hangout.png";
+import { Link } from "react-router-dom";
 
-export default function Page() {
+const HangoutAI = () => {
   return (
-    <div style={{ backgroundImage: `url(${background})`, backgroundSize: "100%" }} className="p-12 min-h-[100vh] flex flex-col items-center">
+    <div className="font-myriad min-h-screen bg-black text-white flex flex-col items-center pt-12">
       {/* Header */}
-      <div className="flex justify-between w-full px-8 py-4 text-white">
-        <h1 className="text-4xl font-bold font-conthrax">HANGOUT AI</h1>
-        <div className="space-x-8 font-myriad">
-          <a href="#about" className="text-lg">ABOUT US</a>
-          <a href="#tech" className="text-lg">TECH STACK</a>
-          <a href="#stats" className="text-lg">WEB STATS</a>
+      <header className="w-full py-4 flex justify-between items-center">
+        <nav className="flex justify-center items-center gap-4 m-auto">
+          <a href="#aboutus" className="hover:text-[#29A1C7] text-lg">ABOUT US</a>
+          <a href="#demo" className="hover:text-[#29A1C7] text-lg">DEMO</a>
+          <Link to="/chat" className="hover:text-[#29A1C7] text-lg">LOGIN/REGISTER</Link>
+        </nav>
+      </header>
+
+      {/* Title and Tagline */}
+      <div className="text-center mt-10 cursor-pointer">
+        <h1 className="text-5xl font-bold font-conthrax">HANGOUT AI</h1>
+        <p className="text-xl mt-8">
+          Plan your next adventure effortlessly with Hangout AI.<br />Tailor your trips to perfection using our intelligent travel assistant.
+        </p>
+      </div>
+
+      {/* Globe Image */}
+      <div className="mt-12 relative flex justify-center items-center size-[500px]">
+        <div className="absolute w-80 h-80 border-4 border-purple-400 rounded-full animate-pulse">
+
+        </div>
+        <div className="bg-gradient-to-r from-[#B85CA7] to-[#29A1C7] absolute size-[500px] border-4 border-blue-500 rounded-full animate-spin-slow">
+
+        </div>
+        <img
+          src={hangout}
+          alt="Globe"
+          className="relative size-[400px] rounded-full"
+        />
+      </div>
+
+      {/* Video Embed Placeholder */}
+
+
+      {/* Additional Sections */}
+      <div className="mt-12 w-4/5 md:w-1/2 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div id="aboutus" className="border-gradient h-40 col-span-2">
+          <p className="text-gray-300">DETAIL FEATURE</p>
+
+        </div>
+        <div id="demo" className="border-gradient h-40 col-span-2">
+          <p className="text-gray-300">VIDEO EMBEDDED</p>
+        </div>
+        <div className="border-gradient h-40">
+          <p className="text-gray-300">DEV 1</p>
+
+        </div>
+        <div className="border-gradient h-40">
+          <p className="text-gray-300">DEV 1</p>
+
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-grow grid grid-cols-12 gap-4 w-full px-8">
-        {/* Left Column */}
-        <div className="col-span-3 flex flex-col space-y-4">
-          <div className="rounded">
-            <p className="text-white text-justify font-myriadl">Make your travel plans to Jakarta, Singapore, and Bangkok  with our AI Travel Assistant. Tailored to your preferences, let us be your guide and discover the world in a way that feels just right for you.</p>
-          </div>
-          <div className="border-gradient h-32">
-            <div className="bg-dark w-full h-full">
-              <p className="text-white">INPUT LOCATION</p>
-            </div>
-          </div>
-          <div className="border-gradient h-32 flex-grow">
-            <div className="bg-dark w-full h-full">
-              <p className="text-white">INPUT DATE, DURATION</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Center Column */}
-        <div className="col-span-7 flex flex-col space-y-4 h-full">
-          <div className="flex-grow space-y-4 flex flex-col">
-            <div className="h-16 rounded-lg w-4/6 self-end userchat p-2">
-              <p className="text-white font-myriadl">First Prompt User Generated</p>
-            </div>
-            <div className="h-64 rounded-lg relative aianswer">
-              <div className="circleai absolute top-0 left-0 w-8 h-8 rounded-full ml-2 mt-2"></div>
-              <p className="text-white font-myriadl pl-12 py-5">RESPONSE AI</p>
-
-            </div>
-          </div>
-
-          <textarea value=" INPUT USER (TEXT AREA)" className="py-2 px-2.5 text-white font-myriadl bg-[#1A1C22] border border-[3px] border-[#6C7B96] h-20 rounded-lg justify-self-end">
-
-          </textarea>
-        </div>
-
-        {/* Right Column */}
-        <div className="col-span-2 flex h-full">
-          <div className="border-gradient w-full w-full flex-grow">
-            <div className="bg-dark w-full h-full">
-              <p className="text-white">ISI APA YA?</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      {/* Footer Gradient */}
+      <footer className="w-full mt-16 py-8 bg-gradient-to-r from-[#B85CA7] to-[#29A1C7]"></footer>
+    </div >
   );
-}
+};
+
+export default HangoutAI;

@@ -7,7 +7,7 @@ import {
 import "./index.css";
 import App from "./App"
 import HomePage from "./pages/HomePage"
-import AboutPage from "./pages/AboutPage"
+import ChatPage from "./pages/ChatPage"
 
 const router = createBrowserRouter([
   {
@@ -19,8 +19,8 @@ const router = createBrowserRouter([
         element: <HomePage />
       },
       {
-        path: "about",
-        element: <AboutPage />
+        path: "chat",
+        element: <ChatPage />
       }
     ]
   },
