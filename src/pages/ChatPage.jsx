@@ -1,83 +1,71 @@
-import { useState } from "react"
-import background from "../assets/background.png"
-import jakarta from "../assets/jakarta.png"
-import kualalumpur from "../assets/kualalumpur.png"
-import singapore from "../assets/singapore.png"
-import ModalForm from "../components/ModalForm"
-import { Link } from "react-router-dom"
+import { useState } from "react";
+import background from "../assets/background.png";
+import jakarta from "../assets/jakarta.png";
+import kualalumpur from "../assets/kualalumpur.png";
+import singapore from "../assets/singapore.png";
+import ModalForm from "../components/ModalForm";
+import { Link } from "react-router-dom";
+import formatDate from "../helpers/formatDate";
+import formatTime from "../helpers/formatTime";
 
-function formatTime(timeString) {
-  // Split the time string into hours and minutes
-  const [hours, minutes] = timeString.split(':').map(Number);
-
-  // Determine AM or PM
-  const period = hours >= 12 ? 'PM' : 'AM';
-
-  // Convert hours to 12-hour format
-  const formattedHours = hours % 12 || 12;
-
-  // Construct the formatted time string
-  return `${formattedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')} ${period}`;
-}
-
-function formatDate(dateString) {
-  const date = new Date(dateString);
-
-  // Get day of the week
-  const optionsDay = { weekday: 'long' };
-  const day = date.toLocaleDateString('en-US', optionsDay);
-
-  // Get day of the month
-  const dayOfMonth = date.getDate();
-
-  // Get month (in abbreviated format)
-  const optionsMonth = { month: 'short' };
-  const month = date.toLocaleDateString('en-US', optionsMonth).toUpperCase();
-
-  // Get full year
-  const year = date.getFullYear();
-
-  // Construct the formatted date string
-  return `${day}, ${dayOfMonth} ${month} ${year}`;
-}
 
 export default function Page() {
   const [openModal, setOpenModal] = useState(true);
-  const [inputText, setInputText] = useState('')
-  const openTheModal = () => setOpenModal(true)
+  const [inputText, setInputText] = useState('');
+  const openTheModal = () => setOpenModal(true);
   const [data, setData] = useState({
     location: "Jakarta",
     startTime: "15:00",
     endTime: "22:00",
     date: new Date(),
-    langlng: { "lat": -6.294531217392458, "lng": 106.78474366664888 }
-  })
+    langlng: { lat: -6.294531217392458, lng: 106.78474366664888 },
+  });
   let locations = {
     Jakarta: jakarta,
     Singapore: singapore,
-    "Kuala Lumpur": kualalumpur
-  }
+    "Kuala Lumpur": kualalumpur,
+  };
 
   return (
-    <div style={{ backgroundImage: `url(${background})`, backgroundSize: "100%" }} className="p-12 min-h-[100vh] flex flex-col items-center">
-      <ModalForm data={data} setData={setData} openModal={openModal} setOpenModal={setOpenModal} />
+    <div
+      style={{ backgroundImage: `url(${background})`, backgroundRepeat: "no-repeat", backgroundSize: "100%" }}
+      className="bg-bottom sm:bg-opacity-80 md:bg-opacity-0 px-4 py-6 md:p-12 sm:min-h-[100vh] md:h-[101vh] flex flex-col items-center"
+    >
+      <ModalForm
+        data={data}
+        setData={setData}
+        openModal={openModal}
+        setOpenModal={setOpenModal}
+      />
       {/* Header */}
-
-      <div className="flex justify-between w-full px-8 py-4 text-white">
-        <h1 className="text-4xl font-bold font-conthrax">HANGOUT AI</h1>
-        <div className="space-x-8 font-myriad">
-          <Link to="/chat" className="text-lg">CHAT</Link>
-          <Link to="/" className="text-lg">ABOUT US</Link>
-          <Link to="/" className="text-lg">LOGOUT</Link>
+      <div className="flex flex-col md:flex-row justify-between w-full px-4 py-4 text-white">
+        <h1 className="text-3xl md:text-4xl font-bold font-conthrax">
+          HANGOUT AI
+        </h1>
+        <div className="mt-2 md:mt-0 space-x-4 md:space-x-8 font-myriad mb-3 md:mb-0">
+          <Link to="/chat" className="text-sm md:text-lg">
+            CHAT
+          </Link>
+          <Link to="/" className="text-sm md:text-lg">
+            ABOUT US
+          </Link>
+          <Link to="/" className="text-sm md:text-lg">
+            LOGOUT
+          </Link>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-grow grid grid-cols-12 gap-4 w-full px-8">
+      <div className="flex-grow grid grid-cols-1 md:grid-cols-12 gap-4 w-full px-4 ">
         {/* Left Column */}
-        <div className="col-span-3 flex flex-col space-y-2">
+        <div className="col-span-12 md:col-span-3 flex flex-col space-y-4 md:space-y-2">
           <div className="rounded">
-            <span className="text-white text-justify font-myriadl">Make your travel plans to <span className="font-myriadb">Jakarta</span>, <span className="font-myriadb">Singapore</span>, and <span className="font-myriadb">Kuala Lumpur</span> with our AI Travel Assistant. Tailored to your preferences, let us be your guide and discover the world in a way that feels just right for you.</span>
+            <p className="text-white text-justify font-myriadl">
+              Make your travel plans to Jakarta, Singapore, and Kuala Lumpur with our AI
+              Travel Assistant. Tailored to your preferences, let us be your
+              guide and discover the world in a way that feels just right for
+              you.
+            </p>
           </div>
           <div className="border-gradient h-36">
             <div className="bg-dark w-full h-full flex flex-col items-center justify-center gap-2">
@@ -85,7 +73,7 @@ export default function Page() {
               <p className="text-xl text-white font-bold font-conthrax">{data.location}</p>
             </div>
           </div>
-          <div className="border-gradient h-32 flex-grow">
+          <div className="border-gradient min-h-32 flex-grow">
             <div className="text-white p-3 rounded-lg flex flex-col  font-myriad">
               <div onClick={() => openTheModal()} className="z-50 cursor-pointer p-2.5 rounded-lg flex flex-col justify-between items-between font-myriad cursor-pointer gap-1">
                 <span className="flex gap-2 font-myriadb text-lg">EDIT YOUR PREFERENCE <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -140,14 +128,13 @@ export default function Page() {
             </div>
           </div>
         </div>
-
         {/* Center Column */}
-        <div className="col-span-7 flex flex-col space-y-4 h-full">
+        <div className="col-span-12 md:col-span-7 flex flex-col space-y-4 h-full">
           <div className="flex-grow space-y-4 flex flex-col">
-            <div className="h-16 rounded-lg w-4/6 self-end userchat p-2">
+            <div className="flex h-16 rounded-lg max-w-5/6 self-end userchat p-2">
               <p className="text-white font-myriadl">First Prompt User Generated</p>
             </div>
-            <div className="h-64 rounded-lg relative aianswer">
+            <div className="h-64 w-full rounded-lg relative aianswer">
               <div className="circleai absolute top-0 left-0 w-8 h-8 rounded-full ml-2 mt-2"></div>
               <p className="text-white font-myriadl pl-12 py-5">RESPONSE AI</p>
 
@@ -158,7 +145,7 @@ export default function Page() {
         </div>
 
         {/* Right Column */}
-        <div className="col-span-2 flex h-full">
+        <div className="hidden col-span-12 md:col-span-2 rounded-2xl md:flex h-full">
           <div className="border-gradient w-full w-full flex-grow">
             <div className="bg-dark w-full h-full">
               <p className="text-white">ISI APA YA?</p>
@@ -166,6 +153,11 @@ export default function Page() {
           </div>
         </div>
       </div>
-    </div >
+
+      {/* Footer */}
+      <footer className="md:hidden mt-8 text-center text-white text-sm">
+        &copy; 2024 Hangout AI. All rights reserved.
+      </footer>
+    </div>
   );
 }
