@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
+import NavBarChat from "../components/NavBarChat"
 import background from "../assets/background.png";
 import jakarta from "../assets/jakarta.png";
 import kualalumpur from "../assets/kualalumpur.png";
 import singapore from "../assets/singapore.png";
 import ModalForm from "../components/ModalForm";
-import { Link, useNavigate } from "react-router-dom";
 import formatDate from "../helpers/formatDate";
 import formatTime from "../helpers/formatTime";
-import { googleLogout } from '@react-oauth/google';
-
+import axios from "axios";
+import { Button } from "flowbite-react";
+import Markdown from 'react-markdown'
 
 export default function Page() {
-  const navigate = useNavigate()
+  const [isLoadingChat, setIsLoading] = useState(false)
+  const [isFirst, setIsFirst] = useState(true)
+  const [messages, setMessages] = useState([])
   const [openModal, setOpenModal] = useState(true);
   const [inputText, setInputText] = useState('');
   const openTheModal = () => setOpenModal(true);
@@ -28,40 +31,70 @@ export default function Page() {
     "Kuala Lumpur": kualalumpur,
   };
 
-  const logout = () => {
-    localStorage.clear()
-    googleLogout();
-    navigate("/")
+
+  const fetchMessage = async () => {
+    try {
+      let { data } = await axios({
+        method: "GET",
+        url: "https://hangout-ai-c81439a5ea16.herokuapp.com/chat",
+        // url: "http://localhost:3000/chat",
+        headers: {
+          access_token: localStorage.getItem("access_token")
+        }
+      })
+
+      setMessages(data.messages)
+    } catch (error) {
+    }
   }
+
+  const chat = async (e) => {
+    e.preventDefault()
+    if (inputText.length) {
+      let temp = [...messages, { role: "user", content: inputText }]
+      setInputText('')
+      setIsLoading(true)
+      const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_GROQ}`
+      };
+      try {
+        const res = await axios({
+          url: "https://api.groq.com/openai/v1/chat/completions",
+          method: "POST",
+          headers,
+          data: {
+            model: "llama-3.1-8b-instant",
+            temperature: 0,
+            messages: temp,
+            stream: false,
+          },
+        });
+        const { choices } = res.data
+        let text = choices[0].message.content.trim();
+        setMessages([...temp, { role: "assistant", content: text }])
+        setIsLoading(false)
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (isFirst) {
+      fetchMessage()
+      setIsFirst(false)
+    }
+  }, [])
 
   return (
     <div
       style={{ backgroundImage: `url(${background})`, backgroundRepeat: "no-repeat", backgroundSize: "100%" }}
-      className="bg-bottom sm:bg-opacity-80 md:bg-opacity-0 px-4 py-6 md:p-12 sm:min-h-[100vh] md:h-[100vh] flex flex-col items-center"
+      className="bg-bottom sm:bg-opacity-80 md:bg-opacity-0 px-4 py-5 md:px-12 md:pt-8 md:pb-6 sm:min-h-[100vh] h-[100vh] flex flex-col items-center"
     >
-      <ModalForm
-        data={data}
-        setData={setData}
-        openModal={openModal}
-        setOpenModal={setOpenModal}
-      />
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between w-full px-4 py-4 text-white">
-        <h1 className="text-3xl md:text-4xl font-bold font-conthrax">
-          HANGOUT AI
-        </h1>
-        <div className="flex mt-2 md:mt-0 space-x-4 md:space-x-8 font-myriad mb-3 md:mb-0">
-          <Link to="/chat" className="text-sm md:text-lg hover:text-[#52EDF2]">
-            CHAT
-          </Link>
-          <Link to="/" className="text-sm md:text-lg hover:text-[#52EDF2]">
-            ABOUT US
-          </Link>
-          <p onClick={logout} className="text-sm md:text-lg hover:text-[#52EDF2] cursor-pointer">
-            LOGOUT
-          </p>
-        </div>
-      </div>
+      <ModalForm data={data} setData={setData} openModal={openModal} setOpenModal={setOpenModal} />
+      <NavBarChat />
 
       {/* Main Content */}
       <div className="flex-grow grid grid-cols-1 md:grid-cols-12 gap-4 w-full px-4 2xl:gap-8">
@@ -138,18 +171,47 @@ export default function Page() {
         </div>
         {/* Center Column */}
         <div className="col-span-12 md:col-span-7 flex flex-col space-y-4 h-full">
-          <div className="flex-grow space-y-4 flex flex-col">
-            <div className="flex h-16 rounded-lg max-w-5/6 self-end userchat p-2">
-              <p className="text-white font-myriadl">First Prompt User Generated</p>
-            </div>
-            <div className="h-64 w-full rounded-lg relative aianswer">
-              <div className="circleai absolute top-0 left-0 w-8 h-8 rounded-full ml-2 mt-2"></div>
-              <p className="text-white font-myriadl pl-12 py-5">RESPONSE AI</p>
+          <div className="flex-grow flex flex-col max-h-[60vh] md:max-h-[70vh]">
+            <div className="overflow-auto flex flex-col space-y-4 ">
+              {
+                messages.map((el, i) => {
+                  if (el.role === "user") {
+                    return <div key={i} className="flex min-h-10 rounded-lg max-w-5/6 self-end userchat py-2 px-3">
+                      <p className="text-white font-myriad">{el.content}</p>
+                    </div>
+                  } else {
+                    return (
+                      <div key={i} className="aianswer flex flex-col w-full rounded-lg ">
+                        <div className="flex items-center gap-2 py-2">
+                          <div className="ml-2 circleai w-8 h-8 rounded-full"></div>
+                          <p className="text-white font-conthrax text-[12px]">HANGOUT AI</p>
+                        </div>
+                        <Markdown className="px-3 py-2 text-white font-myriad">{el.content}</Markdown>
+                      </div>
+                    )
+                  }
+                })
+              }
+              {
+                (isLoadingChat) && (
+                  <div className="min-h-8 w-full rounded-lg relative aianswer">
+                    <div className="circleai absolute top-0 left-0 w-8 h-8 rounded-full ml-2 mt-2"></div>
+                    <p className="text-white font-myriadl pl-12 pt-5">Hangout AI</p>
+                    <Markdown className="px-3 py-2 text-white font-myriad">Loading...</Markdown>
+                  </div>
+                )
+              }
 
             </div>
           </div>
-          <textarea value={inputText} onChange={(e) => setInputText(e.target.value)} className="py-2 px-2.5 text-white font-myriadl bg-[#1A1C22] border border-[3px] border-[#6C7B96] h-20 rounded-lg justify-self-end">
-          </textarea>
+          <div className="flex-1 relative min-h-28">
+            <textarea value={inputText} onChange={(e) => setInputText(e.target.value)} className="absolute w-full h-28 py-2 px-2.5 text-white font-myriadl bg-[#1A1C22] border border-[3px] border-[#6C7B96] h-20 rounded-lg justify-self-end">
+            </textarea>
+            <Button onClick={chat} size="sm" gradientMonochrome="cyan" className="absolute bg-white right-5 bottom-[20px]">
+              Submit
+            </Button>
+          </div>
+
         </div>
 
         {/* Right Column */}
@@ -167,6 +229,6 @@ export default function Page() {
       <footer className="md:hidden mt-8 text-center text-white text-sm">
         &copy; 2024 Hangout AI. All rights reserved.
       </footer>
-    </div>
+    </div >
   );
 }
