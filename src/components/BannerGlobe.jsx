@@ -46,7 +46,7 @@ export default function Component() {
         <img
           src={floor}
           alt="Globe"
-          className="md:h-[90px] w-full left-0 bottom-[-110px] absolute"
+          className="md:h-[90px] w-full left-0 bottom-[-80px] absolute"
         />
       </div>
     </>
