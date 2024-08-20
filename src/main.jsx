@@ -3,12 +3,26 @@ import * as ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
   RouterProvider,
+  Navigate,
+  Outlet,
+  useLocation
 } from "react-router-dom";
 import "./index.css";
 import App from "./App"
 import HomePage from "./pages/HomePage"
 import ChatPage from "./pages/ChatPage"
 
+function RequireAuth({ children }) {
+  let location = useLocation();
+  const accessToken = localStorage.getItem("access_token");
+
+  if (!accessToken) {
+    // Redirect to home page if not authenticated
+    return <Navigate to="/" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
 const router = createBrowserRouter([
   {
     path: "/",
@@ -20,7 +34,11 @@ const router = createBrowserRouter([
       },
       {
         path: "chat",
-        element: <ChatPage />
+        element: (
+          <RequireAuth>
+            <ChatPage />
+          </RequireAuth>
+        )
       }
     ]
   },

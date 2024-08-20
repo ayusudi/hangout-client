@@ -1,15 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import background from "../assets/background.png";
 import jakarta from "../assets/jakarta.png";
 import kualalumpur from "../assets/kualalumpur.png";
 import singapore from "../assets/singapore.png";
 import ModalForm from "../components/ModalForm";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import formatDate from "../helpers/formatDate";
 import formatTime from "../helpers/formatTime";
+import { googleLogout } from '@react-oauth/google';
 
 
 export default function Page() {
+  const navigate = useNavigate()
   const [openModal, setOpenModal] = useState(true);
   const [inputText, setInputText] = useState('');
   const openTheModal = () => setOpenModal(true);
@@ -26,10 +28,16 @@ export default function Page() {
     "Kuala Lumpur": kualalumpur,
   };
 
+  const logout = () => {
+    localStorage.clear()
+    googleLogout();
+    navigate("/")
+  }
+
   return (
     <div
       style={{ backgroundImage: `url(${background})`, backgroundRepeat: "no-repeat", backgroundSize: "100%" }}
-      className="bg-bottom sm:bg-opacity-80 md:bg-opacity-0 px-4 py-6 md:p-12 sm:min-h-[100vh] md:h-[101vh] flex flex-col items-center"
+      className="bg-bottom sm:bg-opacity-80 md:bg-opacity-0 px-4 py-6 md:p-12 sm:min-h-[100vh] md:h-[100vh] flex flex-col items-center"
     >
       <ModalForm
         data={data}
@@ -42,41 +50,41 @@ export default function Page() {
         <h1 className="text-3xl md:text-4xl font-bold font-conthrax">
           HANGOUT AI
         </h1>
-        <div className="mt-2 md:mt-0 space-x-4 md:space-x-8 font-myriad mb-3 md:mb-0">
-          <Link to="/chat" className="text-sm md:text-lg">
+        <div className="flex mt-2 md:mt-0 space-x-4 md:space-x-8 font-myriad mb-3 md:mb-0">
+          <Link to="/chat" className="text-sm md:text-lg hover:text-[#52EDF2]">
             CHAT
           </Link>
-          <Link to="/" className="text-sm md:text-lg">
+          <Link to="/" className="text-sm md:text-lg hover:text-[#52EDF2]">
             ABOUT US
           </Link>
-          <Link to="/" className="text-sm md:text-lg">
+          <p onClick={logout} className="text-sm md:text-lg hover:text-[#52EDF2] cursor-pointer">
             LOGOUT
-          </Link>
+          </p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-grow grid grid-cols-1 md:grid-cols-12 gap-4 w-full px-4 ">
+      <div className="flex-grow grid grid-cols-1 md:grid-cols-12 gap-4 w-full px-4 2xl:gap-8">
         {/* Left Column */}
-        <div className="col-span-12 md:col-span-3 flex flex-col space-y-4 md:space-y-2">
+        <div className="col-span-12 md:col-span-3 flex flex-col space-y-4 md:space-y-2 2xl:gap-4">
           <div className="rounded">
-            <p className="text-white text-justify font-myriadl">
+            <p className="text-white text-justify font-myriadl 2xl:text-lg">
               Make your travel plans to Jakarta, Singapore, and Kuala Lumpur with our AI
               Travel Assistant. Tailored to your preferences, let us be your
               guide and discover the world in a way that feels just right for
               you.
             </p>
           </div>
-          <div className="border-gradient h-36">
-            <div className="bg-dark w-full h-full flex flex-col items-center justify-center gap-2">
-              <img className="h-16" src={locations[data.location]} alt={data.location} />
+          <div className="border-gradient flex-grow">
+            <div className="bg-dark w-full h-full flex flex-col items-center justify-center gap-2 2xl:gap-4 py-3">
+              <img className="sm:h-18" src={locations[data.location]} alt={data.location} />
               <p className="text-xl text-white font-bold font-conthrax">{data.location}</p>
             </div>
           </div>
-          <div className="border-gradient min-h-32 flex-grow">
-            <div className="text-white p-3 rounded-lg flex flex-col  font-myriad">
-              <div onClick={() => openTheModal()} className="z-50 cursor-pointer p-2.5 rounded-lg flex flex-col justify-between items-between font-myriad cursor-pointer gap-1">
-                <span className="flex gap-2 font-myriadb text-lg">EDIT YOUR PREFERENCE <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <div className="border-gradient py-2 2xl:py-10 flex flex-col ">
+            <div className="cursor-pointer text-white p-3 rounded-lg flex flex-col  font-myriad">
+              <div onClick={() => openTheModal()} className="z-50 mt-0 cursor-pointer p-2.5 rounded-lg flex flex-col justify-between items-between font-myriad cursor-pointer gap-0.5">
+                <span className="flex gap-2 text-md 2xl:text-xl font-conthrax">EDIT YOUR PREFERENCE <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M17.2583 5.8668C17.5833 5.5418 17.5833 5.00013 17.2583 4.6918L15.3083 2.7418C15 2.4168 14.4583 2.4168 14.1333 2.7418L12.6 4.2668L15.725 7.3918M2.5 14.3751V17.5001H5.625L14.8417 8.27513L11.7167 5.15013L2.5 14.3751Z" fill="white" />
                 </svg></span>
                 <div className="flex flex-col gap-4 py-4">
@@ -122,7 +130,7 @@ export default function Page() {
                   </div>
                 </div>
               </div>
-              <button onClick={() => prompt(JSON.stringify(data))} className="z-50 hover:bg-black font-conthrax bg-teal w-full py-2 rounded-md hover:bg-teal-600 transition-colors  cursor-pointer">
+              <button onClick={() => prompt(JSON.stringify(data))} className="z-50 mb-2 hover:bg-black font-conthrax bg-teal w-full py-2 rounded-md hover:bg-teal-600 transition-colors  cursor-pointer">
                 GENERATE
               </button>
             </div>
@@ -148,7 +156,8 @@ export default function Page() {
         <div className="hidden col-span-12 md:col-span-2 rounded-2xl md:flex h-full">
           <div className="border-gradient w-full w-full flex-grow">
             <div className="bg-dark w-full h-full">
-              <p className="text-white">ISI APA YA?</p>
+              <p className="text-white">{localStorage.getItem("name")}</p>
+              <p className="text-white">{localStorage.getItem("email")}</p>
             </div>
           </div>
         </div>
