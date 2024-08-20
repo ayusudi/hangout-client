@@ -31,3 +31,23 @@
   font-family: 'Conthrax';
   src: url("./fonts/conthrax-sb.otf") format("opentype");
 }
+
+.circle {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  animation: bounce 4s infinite ease-in-out;
+}
+
+@keyframes bounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-100px);
+  }
+}
