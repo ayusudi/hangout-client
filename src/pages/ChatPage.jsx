@@ -85,6 +85,7 @@ export default function Page() {
     if (isFirst) {
       fetchMessage()
       setIsFirst(false)
+
     }
   }, [])
 
@@ -204,7 +205,7 @@ export default function Page() {
 
             </div>
           </div>
-          <div className="flex-1 relative min-h-28">
+          <div className="relative h-28">
             <textarea value={inputText} onChange={(e) => setInputText(e.target.value)} className="absolute w-full h-28 py-2 px-2.5 text-white font-myriadl bg-[#1A1C22] border border-[3px] border-[#6C7B96] h-20 rounded-lg justify-self-end">
             </textarea>
             <Button onClick={chat} size="sm" gradientMonochrome="cyan" className="absolute bg-white right-5 bottom-[20px]">
