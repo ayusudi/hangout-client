@@ -14,7 +14,7 @@ export default function Component() {
         HANGOUT AI
       </h1>
       <div className="flex mt-2 md:mt-0 space-x-4 md:space-x-8 font-myriad mb-3 md:mb-0">
-        <Link to="/chat" className="text-sm md:text-lg hover:text-[#52EDF2]">
+        <Link to="/chats" className="text-sm md:text-lg hover:text-[#52EDF2]">
           CHAT
         </Link>
         <Link to="/" className="text-sm md:text-lg hover:text-[#52EDF2]">

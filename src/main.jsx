@@ -15,12 +15,9 @@ import ChatPage from "./pages/ChatPage"
 function RequireAuth({ children }) {
   let location = useLocation();
   const accessToken = localStorage.getItem("access_token");
-
   if (!accessToken) {
-    // Redirect to home page if not authenticated
     return <Navigate to="/" state={{ from: location }} replace />;
   }
-
   return children;
 }
 const router = createBrowserRouter([
@@ -33,7 +30,7 @@ const router = createBrowserRouter([
         element: <HomePage />
       },
       {
-        path: "chat",
+        path: "chats",
         element: (
           <RequireAuth>
             <ChatPage />
@@ -43,13 +40,8 @@ const router = createBrowserRouter([
     ]
   },
 ]);
-
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <RouterProvider router={router} />
   </React.StrictMode>
 );
-
-
-// GET / 
-// GET /about 

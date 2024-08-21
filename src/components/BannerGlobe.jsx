@@ -6,10 +6,9 @@ import floor from "../assets/floor.png"
 export default function Component() {
   return (
     <>
-      {/* Title and Tagline */}
       <div className="text-center mt-10 cursor-pointer">
-        <h1 className="text-5xl font-bold font-conthrax">HANGOUT AI</h1>
-        <p className="text-xl mt-8 sm:max-w-[80%] md:max-w-full m-auto">
+        <h1 className="text-5xl sm:max-w-[320px] md:max-w-[80%] font-bold font-conthrax m-auto">HANGOUT AI</h1>
+        <p className="text-xl mt-8 max-w-[300px] md:max-w-full m-auto">
           Plan your next adventure effortlessly with Hangout AI.<br />Tailor your trips to perfection using our intelligent travel assistant.
         </p>
       </div>
@@ -28,9 +27,7 @@ export default function Component() {
             <img src={pink} alt="pink2" />
           </div>
         </div>
-
       </div>
-      {/* Globe Image */}
       <div>
         <div className="z-10 mt-12 relative flex justify-center items-center md:size-[500px] sm:size-[250px]">
           <div className="absolute w-80 h-80 border-4 border-purple-400 rounded-full animate-pulse">
@@ -45,8 +42,8 @@ export default function Component() {
         </div>
         <img
           src={floor}
-          alt="Globe"
-          className="md:h-[90px] w-full left-0 bottom-[-80px] absolute"
+          alt="floor"
+          className="sm:hidden xl:flex md:h-[90px] w-full left-0 md:bottom-[-70px] 2xl:bottom-0 absolute"
         />
       </div>
     </>

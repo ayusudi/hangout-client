@@ -13,14 +13,6 @@
 }
 
 @font-face {
-  font-family: 'Myriad Pro Semibold';
-  font-style: normal;
-  font-weight: normal;
-  src: local('Myriad Pro Semibold'), url('./fonts/MYRIADPRO-SEMIBOLD.woff') format('woff');
-}
-
-
-@font-face {
   font-family: 'Myriad Pro Bold';
   font-style: normal;
   font-weight: normal;

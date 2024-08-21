@@ -13,14 +13,11 @@ const HangoutAI = () => {
       let { data } = await axios({
         method: "POST",
         url: "https://hangout-ai-c81439a5ea16.herokuapp.com/social-login",
-        // url: "http://localhost:3000/social-login",
         data: {
           access_token: response.access_token
         }
       })
       let { access_token, user } = data
-      console.log(data);
-
       localStorage.setItem("access_token", access_token)
       localStorage.setItem("name", user.name)
       localStorage.setItem("email", user.email)
@@ -30,7 +27,6 @@ const HangoutAI = () => {
       navigate("/chat");
     },
     onError: error => {
-      // console.log('Login Failed:', error);
     },
   });
 
@@ -42,7 +38,7 @@ const HangoutAI = () => {
           <a href="#aboutus" className="hover:text-[#52EDF2] text-lg">ABOUT US</a>
           <a href="#demo" className="hover:text-[#52EDF2] text-lg">DEMO</a>
           {
-            localStorage.getItem("email") && localStorage.getItem("access_token") ? <Link className="hover:text-[#52EDF2]" to="/chat">CHAT</Link> :
+            localStorage.getItem("email") && localStorage.getItem("access_token") ? <Link className="hover:text-[#52EDF2] text-lg" to="/chats">CHAT</Link> :
               <p onClick={login} className={loading ? "text-[#52EDF2] text-lg" : "hover:text-[#52EDF2] text-lg"}>{loading ? 'PLEASE WAIT' : 'LOGIN/REGISTER'}</p>
           }
         </nav>
@@ -51,7 +47,7 @@ const HangoutAI = () => {
       <BannerGlobe />
 
       {/* Additional Sections */}
-      <div className="flex flex-col gap-6 my-20 md:my-36 sm:w-[90%] md:w-[640px]">
+      <div className="flex flex-col gap-6 my-20 md:my-36 2xl:my-44 2xl:pt-20 sm:w-[90%] md:w-[640px]">
         <div id="aboutus" className="border-gradient h-40">
           <p className="text-gray-300">DETAIL FEATURE</p>
         </div>

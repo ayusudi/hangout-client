@@ -1,3 +1,5 @@
+import pink from "../assets/bulletpink.png"
+import blue from "../assets/bulletblue.png"
 import { useEffect, useState } from "react";
 import NavBarChat from "../components/NavBarChat"
 import background from "../assets/background.png";
@@ -6,24 +8,35 @@ import kualalumpur from "../assets/kualalumpur.png";
 import singapore from "../assets/singapore.png";
 import ModalForm from "../components/ModalForm";
 import formatDate from "../helpers/formatDate";
-import formatTime from "../helpers/formatTime";
 import axios from "axios";
 import { Button } from "flowbite-react";
 import Markdown from 'react-markdown'
-
+import remarkGfm from 'remark-gfm'
+import rehypeRaw from 'rehype-raw'
+let defaultMessage = [
+  {
+    "content": "I am an AI called **Hangout AI** will help you to generate itenary from preferences day, time, and location.\n### How to Use \n1. Edit the preference form by clicking the edit icon or the box.\n2. Fill out the preference form.\n3. The details of your preferences will update, including the city's illustration.\n4. Click the Generate button to start a new chat and create your itinerary.\n5. Your chat will not be reset after generating the itinerary, unlike this channel chat.\n6. Enjoy generate itinerary!",
+    "role": "system"
+  }
+]
 export default function Page() {
+  let text = "Loading.. Loading.. Loading.."
+  let [chatId, setChatId] = useState('')
+  const [loadingPanel, setLoadingPanel] = useState(false)
+  const [loadingList, setLoadingList] = useState(false)
   const [isLoadingChat, setIsLoading] = useState(false)
-  const [isFirst, setIsFirst] = useState(true)
-  const [messages, setMessages] = useState([])
+  const [isGenerating, setGenerate] = useState(false)
+  const [messages, setMessages] = useState(defaultMessage)
   const [openModal, setOpenModal] = useState(true);
   const [inputText, setInputText] = useState('');
+  const [listChat, setListChat] = useState([]);
   const openTheModal = () => setOpenModal(true);
   const [data, setData] = useState({
     location: "Jakarta",
     startTime: "15:00",
     endTime: "22:00",
-    date: new Date(),
-    langlng: { lat: -6.294531217392458, lng: 106.78474366664888 },
+    date: new Date().toDateString(),
+    latlng: { lat: -6.294531217392458, lng: 106.78474366664888 },
   });
   let locations = {
     Jakarta: jakarta,
@@ -31,23 +44,89 @@ export default function Page() {
     "Kuala Lumpur": kualalumpur,
   };
 
-
-  const fetchMessage = async () => {
+  const fetchChatId = async (id) => {
     try {
-      let { data } = await axios({
+      let response = await axios({
         method: "GET",
-        url: "https://hangout-ai-c81439a5ea16.herokuapp.com/chat",
-        // url: "http://localhost:3000/chat",
+        url: "https://hangout-ai-c81439a5ea16.herokuapp.com/chats/" + id,
         headers: {
           access_token: localStorage.getItem("access_token")
         }
       })
-
-      setMessages(data.messages)
+      setMessages(response.data.messages)
+      let str = response.data.name.split(",")
+      setData({
+        location: str[0],
+        date: str[1],
+        startTime: str[2],
+        endTime: str[3],
+        address: data.address,
+        latlng: data.latlng
+      })
+      setChatId(id)
     } catch (error) {
     }
   }
+  const moveId = async (id) => {
+    if (!id) {
+      setChatId('')
+      setMessages(defaultMessage)
+    }
+    else {
+      setLoadingPanel(true)
+      setChatId(id)
+      await fetchChatId(id)
+      setLoadingPanel(false)
+    }
+  }
 
+
+  const fetchListChat = async () => {
+    try {
+      setLoadingList(true)
+      let { data } = await axios({
+        method: "GET",
+        url: "https://hangout-ai-c81439a5ea16.herokuapp.com/chats",
+        headers: {
+          access_token: localStorage.getItem("access_token")
+        }
+      })
+      let listing = data.map((el) => {
+        let [name, date, startTime, endTime] = el.name.split(",")
+        return {
+          id: el.id,
+          name,
+          date,
+          subhead: `${startTime} - ${endTime}`
+        }
+      })
+      setListChat([
+        {
+          id: "",
+          name: "First Chat",
+          date: new Date().toLocaleDateString("en-EN"),
+          subhead: "How To Use Hangout AI"
+        },
+        ...listing
+      ])
+    } catch (error) {
+    } finally {
+      setLoadingList(false)
+    }
+  }
+
+  let saveIt = async (id, messages) => {
+    let res = await axios({
+      method: "POST",
+      url: "https://hangout-ai-c81439a5ea16.herokuapp.com/chats/" + id,
+      headers: {
+        access_token: localStorage.getItem("access_token")
+      },
+      data: {
+        messages
+      }
+    })
+  }
   const chat = async (e) => {
     e.preventDefault()
     if (inputText.length) {
@@ -66,7 +145,7 @@ export default function Page() {
           data: {
             model: "llama-3.1-8b-instant",
             temperature: 0,
-            messages: temp,
+            messages: temp.map(el => ({ role: el.role, content: el.content })),
             stream: false,
           },
         });
@@ -74,6 +153,9 @@ export default function Page() {
         let text = choices[0].message.content.trim();
         setMessages([...temp, { role: "assistant", content: text }])
         setIsLoading(false)
+        if (chatId) {
+          saveIt(chatId, [...temp, { role: "assistant", content: text }])
+        }
       } catch (error) {
         console.error(error);
         return null;
@@ -81,13 +163,31 @@ export default function Page() {
     }
   }
 
-  useEffect(() => {
-    if (isFirst) {
-      fetchMessage()
-      setIsFirst(false)
-
+  const generate = async (e) => {
+    e.preventDefault()
+    setLoadingPanel(true)
+    setGenerate(true)
+    try {
+      let response = await axios({
+        method: "POST",
+        url: "https://hangout-ai-c81439a5ea16.herokuapp.com/generate",
+        data,
+        headers: {
+          access_token: localStorage.getItem("access_token")
+        }
+      })
+      setGenerate(false)
+      setMessages(response.data.messages)
+      setChatId(response.data.id)
+      setLoadingPanel(false)
+    } catch (error) {
     }
-  }, [])
+  }
+
+  useEffect(() => {
+    fetchListChat()
+  }, [messages])
+
 
   return (
     <div
@@ -96,10 +196,7 @@ export default function Page() {
     >
       <ModalForm data={data} setData={setData} openModal={openModal} setOpenModal={setOpenModal} />
       <NavBarChat />
-
-      {/* Main Content */}
       <div className="flex-grow grid grid-cols-1 md:grid-cols-12 gap-4 w-full px-4 2xl:gap-8">
-        {/* Left Column */}
         <div className="col-span-12 md:col-span-3 flex flex-col space-y-4 md:space-y-2 2xl:gap-4">
           <div className="rounded">
             <p className="text-white text-justify font-myriadl 2xl:text-lg">
@@ -133,7 +230,6 @@ export default function Page() {
                       <p className="text-lg font-myriadb">{data.location}</p>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-3">
                     <div className="bg-teal size-12 flex justify-center items-center rounded-full">
                       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
@@ -146,7 +242,6 @@ export default function Page() {
                       <p className="text-lg font-myriadb">{formatDate(data.date)}</p>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-3">
                     <div className="bg-teal size-12 flex justify-center items-center rounded-full">
                       <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
@@ -155,57 +250,110 @@ export default function Page() {
                     </div>
                     <div>
                       <p className="font-medium">Start Time</p>
-                      <p className="text-lg font-myriadb">{formatTime(data.startTime)}</p>
+                      <p className="text-lg font-myriadb">{data.startTime}</p>
                     </div>
                     <div className='ml-3'>
                       <p className="font-medium ">End Time</p>
-                      <p className="text-lg font-myriadb">{formatTime(data.endTime)}</p>
+                      <p className="text-lg font-myriadb">{data.endTime}</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <button onClick={() => prompt(JSON.stringify(data))} className="z-50 mb-2 hover:bg-black font-conthrax bg-teal w-full py-2 rounded-md hover:bg-teal-600 transition-colors  cursor-pointer">
-                GENERATE
+              <button onClick={generate} className="z-50 mb-2 hover:bg-black font-conthrax bg-teal w-full py-2 rounded-md hover:bg-teal-600 transition-colors  cursor-pointer">
+                {isGenerating ? "GENERATING.." : "GENERATE"}
               </button>
             </div>
           </div>
         </div>
         {/* Center Column */}
-        <div className="col-span-12 md:col-span-7 flex flex-col space-y-4 h-full">
+        <div className="col-span-12 md:col-span-7 flex flex-col space-y-4 h-full  justify-between">
           <div className="flex-grow flex flex-col max-h-[60vh] md:max-h-[70vh]">
-            <div className="overflow-auto flex flex-col space-y-4 ">
-              {
-                messages.map((el, i) => {
-                  if (el.role === "user") {
-                    return <div key={i} className="flex min-h-10 rounded-lg max-w-5/6 self-end userchat py-2 px-3">
-                      <p className="text-white font-myriad">{el.content}</p>
-                    </div>
-                  } else {
-                    return (
-                      <div key={i} className="aianswer flex flex-col w-full rounded-lg ">
+            {
+              !loadingPanel ? (
+                <div className="overflow-auto flex flex-col space-y-4 ">
+                  {
+                    messages.map((el, i) => {
+                      let iframeSrc = ''
+                      if (el.latlng) iframeSrc = `https://www.google.com/maps/embed/v1/place?q=${el.latlng.lat},${el.latlng.lng}&key=${import.meta.env.VITE_GMAP}`
+                      if (el.role === "user") {
+                        return <div key={i} className="flex flex-col rounded-lg max-w-5/6 self-end userchat py-2 px-3">
+                          <Markdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]} className="prose px-3 py-2 !text-white">{el.content}</Markdown>
+                          {
+                            el.latlng && (
+                              <iframe
+                                className="px-2 pb-3"
+                                src={iframeSrc}
+                                width="100%"
+                                height="100%"
+                                style={{ border: 0 }}
+                                allowFullScreen=""
+                                loading="lazy"
+                                title="Google Map"
+                              ></iframe>
+                            )
+                          }
+                        </div>
+                      } else {
+                        return (
+                          <div key={i} className="aianswer flex flex-col w-full rounded-lg p-1.5">
+                            <div className="flex items-center gap-2 py-2">
+                              <div className="ml-2 circleai w-8 h-8 rounded-full"></div>
+                              <p className="text-white font-conthrax text-[12px]">HANGOUT AI</p>
+                            </div>
+                            <Markdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]} className="prose px-3 py-2 !text-white max-w-full">{el.content}</Markdown>
+                            {
+                              el.metadata && (
+                                <div className="ml-4 p-3 border-s-4 mt-3 mb-4">
+                                  <b className="!text-[#359DA6]">Metionable :</b>
+                                  <ul className="my-1">
+                                    {
+                                      el.metadata.map((el, j) => <li key={j}>- {el.name}</li>)
+                                    }
+                                  </ul>
+                                  <div className="flex gap-2">
+                                    <Button outline gradientDuoTone="cyanToBlue" className="mt-2">Open Preview</Button>
+                                    <Button outline gradientDuoTone="cyanToBlue" className="mt-2">Open New Tab</Button>
+                                  </div>
+                                </div>
+                              )
+                            }
+                          </div>
+                        )
+                      }
+                    })
+                  }
+                  {
+                    (isLoadingChat) && (
+                      <div className="aianswer flex flex-col w-full rounded-lg p-1.5">
                         <div className="flex items-center gap-2 py-2">
                           <div className="ml-2 circleai w-8 h-8 rounded-full"></div>
                           <p className="text-white font-conthrax text-[12px]">HANGOUT AI</p>
                         </div>
-                        <Markdown className="px-3 py-2 text-white font-myriad">{el.content}</Markdown>
+                        <Markdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]} className="prose px-3 py-2 !text-white max-w-full">Loading ...</Markdown>
                       </div>
                     )
                   }
-                })
-              }
-              {
-                (isLoadingChat) && (
-                  <div className="min-h-8 w-full rounded-lg relative aianswer">
-                    <div className="circleai absolute top-0 left-0 w-8 h-8 rounded-full ml-2 mt-2"></div>
-                    <p className="text-white font-myriadl pl-12 pt-5">Hangout AI</p>
-                    <Markdown className="px-3 py-2 text-white font-myriad">Loading...</Markdown>
+                </div>
+              ) : (
+                <div className="flex flex-col justify-center items-center p-6 text-white flex-grow">
+                  <div className="flex flex-col justify-center border-gradient loading-container m-auto text-xl">
+                    <div className="flex justify-center loading-container font-conthrax p-4">
+                      {text.split('').map((letter, index) => (
+                        <span
+                          key={index}
+                          className="letter font-conthrax"
+                          style={{ animationDelay: `${index * 0.04}s` }} // Stagger the animation for each letter
+                        >
+                          {letter}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                )
-              }
-
-            </div>
+                </div>
+              )
+            }
           </div>
-          <div className="relative h-28">
+          <div className="bottom-0 relative h-28">
             <textarea value={inputText} onChange={(e) => setInputText(e.target.value)} className="absolute w-full h-28 py-2 px-2.5 text-white font-myriadl bg-[#1A1C22] border border-[3px] border-[#6C7B96] h-20 rounded-lg justify-self-end">
             </textarea>
             <Button onClick={chat} size="sm" gradientMonochrome="cyan" className="absolute bg-white right-5 bottom-[20px]">
@@ -216,20 +364,66 @@ export default function Page() {
         </div>
 
         {/* Right Column */}
-        <div className="hidden col-span-12 md:col-span-2 rounded-2xl md:flex h-full">
-          <div className="border-gradient w-full w-full flex-grow">
-            <div className="bg-dark w-full h-full">
-              <p className="text-white">{localStorage.getItem("name")}</p>
-              <p className="text-white">{localStorage.getItem("email")}</p>
+        <div className="hidden col-span-12 md:col-span-2 rounded-2xl md:flex flex-col">
+          <div className="border-gradient w-full flex-grow flex flex-col">
+            <div className="z-50 bg-dark w-full flex flex-col">
+              <p className="text-white text-lg font-conthrax py-2 text-center">List Chat</p>
+              <hr />
+              <div className="flex flex-col flex-grow overflow-y-auto max-h-[80vh]">
+                {listChat.map((el, i) => {
+                  let { id, name, date, subhead } = el;
+                  if (!id) {
+                    return (
+                      <div
+                        onClick={() => moveId('')}
+                        key={i}
+                        className="flex gap-2 p-2 group cursor-pointer pt-3.5"
+                      >
+                        <div className={!chatId ? "w-2 h-2 rounded-full bg-[#4DC0C7] mb-1.5" : "w-2 h-2 rounded-full bg-transparent mb-1.5"}></div>
+                        <div className="group-hover:text-[#7deaf2] text-white">
+                          <p className="text-sm font-conthrax">{name}</p>
+                          <p className="text-sm">{date}</p>
+                          <p className="text-sm">{subhead}</p>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div
+                        onClick={() => moveId(`${id}`)}
+                        key={i}
+                        className="group flex gap-2 p-2 cursor-pointer hover:text-[#A3E8EB]"
+                      >
+                        <div className={Number(chatId) === id ? "w-2 h-2 rounded-full bg-[#4DC0C7] mb-1.5" : "w-2 h-2 rounded-full bg-transparent mb-1.5"}></div>
+                        <div className="text-white group-hover:text-[#7deaf2]">
+                          <p className="text-sm font-conthrax">{name}</p>
+                          <p className="text-sm">{date}</p>
+                          <p className="text-sm">{subhead}</p>
+                        </div>
+                      </div>
+                    );
+                  }
+                })}
+                {!listChat.length && loadingList && (
+                  <div className="m-auto flex justify-center items-center w-full">
+                    <img
+                      alt="loading"
+                      className="m-auto p-4 w-full"
+                      src="https://i.pinimg.com/originals/3e/f0/e6/3ef0e69f3c889c1307330c36a501eb12.gif"
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+
+      </div >
 
       {/* Footer */}
-      <footer className="md:hidden mt-8 text-center text-white text-sm">
-        &copy; 2024 Hangout AI. All rights reserved.
-      </footer>
+      < footer className="md:hidden mt-8 text-center text-white text-sm" >
+        & copy; 2024 Hangout AI.All rights reserved.
+      </footer >
     </div >
   );
 }

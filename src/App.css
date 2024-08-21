@@ -4,6 +4,19 @@
 
 body {
   background-color: #080D12;
+
+}
+
+h1,
+h2,
+h3,
+b,
+li,
+ul,
+ol,
+strong {
+  color: white !important;
+
 }
 
 .border-gradient {
@@ -36,6 +49,54 @@ body {
 }
 
 .userchat {
-  border: 2px solid #224D70;
+  border: 2px solid #8dbfe9;
   background: linear-gradient(180deg, #06282F 0%, #127E95 100%);
+}
+
+/* LoadingAnimation.css */
+
+.loading-container {
+  display: flex;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 24px;
+  white-space: nowrap;
+}
+
+.letter {
+  opacity: 0;
+  animation: appear 1s forwards;
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* LoadingAnimation.css */
+
+.loading-container {
+  display: flex;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 24px;
+  white-space: nowrap;
+}
+
+.letter {
+  opacity: 0;
+  animation: appear 1s forwards;
+}
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
