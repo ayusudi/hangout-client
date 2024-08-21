@@ -2,8 +2,17 @@ import hangout from "../assets/hangout.png";
 import pink from "../assets/bulletpink.png"
 import blue from "../assets/bulletblue.png"
 import floor from "../assets/floor.png"
+import { useNavigate } from "react-router-dom";
 
-export default function Component() {
+export default function Component({ login }) {
+  const navigate = useNavigate()
+  const actionGlobe = () => {
+    if (localStorage.getItem("access_token")) {
+      navigate("/chats")
+    } else {
+      login()
+    }
+  }
   return (
     <>
       <div className="text-center mt-10 cursor-pointer">
@@ -28,8 +37,8 @@ export default function Component() {
           </div>
         </div>
       </div>
-      <div>
-        <div className="z-10 mt-12 relative flex justify-center items-center md:size-[500px] sm:size-[250px]">
+      <div onClick={actionGlobe}>
+        <div className="cursor-pointer z-10 mt-12 relative flex justify-center items-center md:size-[500px] sm:size-[250px]">
           <div className="absolute w-80 h-80 border-4 border-purple-400 rounded-full animate-pulse">
           </div>
           <div className="bg-gradient-to-r from-[#B85CA7] to-[#52EDF2] absolute md:size-[500px] sm:size-[250px] border-4 border-blue-500 rounded-full animate-spin-slow">
