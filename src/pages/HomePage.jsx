@@ -24,7 +24,7 @@ const HangoutAI = () => {
       localStorage.setItem("image", user.image)
       localStorage.setItem("createdAt", user.createdAt)
       setLoading(false)
-      navigate("/chat");
+      navigate("/chats");
     },
     onError: error => {
     },
