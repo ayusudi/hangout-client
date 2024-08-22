@@ -37,8 +37,8 @@ const HangoutAI = () => {
       <BannerGlobe login={login} />
       <div className="flex flex-col gap-8 my-20 md:my-36 2xl:my-44 2xl:pt-20 sm:w-[80%] md:w-[640px]">
         <AboutUs />
-        <div id="demo" className="border-gradient h-40">
-          <p className="text-gray-300">VIDEO EMBEDDED</p>
+        <div className="border-gradient flex-grow flex flex-col md:h-[380px]">
+          <iframe id="demo" className="rounded z-50 lg:w-auto flex-grow text-white flex" src={import.meta.env.VITE_YOUTUBE} title="YouTube video player" ></iframe>
         </div>
         <div className="flex flex-col md:flex-row gap-8">
           <CardFeature keyname={"Personalized Itineraries"} />

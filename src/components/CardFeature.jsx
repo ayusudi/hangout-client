@@ -20,7 +20,7 @@ export default function Component({ keyname }) {
     },
     "Enhanced Precision": {
       img: accuracy,
-      message: "Advanced LLMs and embeddings provide highly accurate and contextually relevant recommendations for locations and activities."
+      message: "LLMs, embeddings, weather, and location data offer precise, context-aware recommendations."
     }
   }
   return (
