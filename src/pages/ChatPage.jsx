@@ -166,6 +166,8 @@ export default function Page() {
           access_token: localStorage.getItem("access_token")
         }
       })
+      setPreview(false)
+      setDataPreview([])
       setGenerate(false)
       setMessages(response.data.messages)
       setChatId(response.data.id)
@@ -330,22 +332,25 @@ export default function Page() {
                                     <Button onClick={() => preview(el.metadata)} outline gradientDuoTone="cyanToBlue" className="sm:mt-0 md:mt-2">Open Preview</Button>
                                     <Button onClick={() => newTab(el.metadata)} outline gradientDuoTone="cyanToBlue" className="sm:mt-0 md:mt-2 ">Open New Tab</Button>
                                   </div>
-                                  <div className="pt-5 ">
-                                    {
-                                      dataPreview.map(el => {
-                                        let { title, images } = el
-                                        return (
-                                          <div key={el.cid} className="text-white mb-2">
-                                            <p>{title} ({el.category})</p>
-                                            <div className="overflow-x-scroll flex h-44 sm:w-[300px] md:w-[96%]">
-                                              {images.map(e => <img key={e.title} src={e.image} alt={e.title} onError={remove} />)}
-                                            </div>
-
-                                          </div>
-                                        )
-                                      })
-                                    }
-                                  </div>
+                                  {
+                                    openPreview && (
+                                      <div className="pt-5 ">
+                                        {
+                                          dataPreview.map(el => {
+                                            let { title, images } = el
+                                            return (
+                                              <div key={el.cid} className="text-white mb-2">
+                                                <p>{title} ({el.category})</p>
+                                                <div className="overflow-x-scroll flex h-44 sm:w-[300px] md:w-[96%]">
+                                                  {images.map(e => <img key={e.title} src={e.image} alt={e.title} onError={remove} />)}
+                                                </div>
+                                              </div>
+                                            )
+                                          })
+                                        }
+                                      </div>
+                                    )
+                                  }
                                 </div>
                               )
                             }
