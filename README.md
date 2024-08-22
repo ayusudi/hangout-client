@@ -1,4 +1,4 @@
-# Hangout AI Client
+# Hangout AI
 
 Your AI-powered travel guide with AI-generated itineraries for Jakarta, Singapore, and Kuala Lumpur. With over 500+ locations in our database, our AI curates a seamless travel experience just for you.
 
@@ -13,23 +13,23 @@ Table of contents
 ## User Interface
 
 1. Landing Page 
-![landingpage](./screenshot/landingpage.png)
+![landingpage](https://raw.githubusercontent.com/ayusudi/hangout-ai/main/screenshot/landingpage.png)
 > Users need to log in with the Google Sign-In option that we provide.  
 > Note : We will change the YouTube link after we finish recording.
 
 2. Chat Page 
-![chat](./screenshot/home.png)
-![form](./screenshot/form.png)
+![chat](https://raw.githubusercontent.com/ayusudi/hangout-ai/main/screenshot/home.png)
+![form](https://raw.githubusercontent.com/ayusudi/hangout-ai/main/screenshot/form.png)
 > We set the default location to Jakarta, but if the user changes it to Singapore or Kuala Lumpur, the city illustration will change as well.
 <br/>
 <br/>
-![loading](./screenshot/loading.png)
-![chat-response](./screenshot/chat.png)
-![chat-before-preview](./screenshot/chat-beforepreview.png)
+![loading](https://raw.githubusercontent.com/ayusudi/hangout-ai/main/screenshot/loading.png)
+![chat-response](https://raw.githubusercontent.com/ayusudi/hangout-ai/main/screenshot/chat.png)
+![chat-before-preview](https://raw.githubusercontent.com/ayusudi/hangout-ai/main/screenshot/chat-beforepreview.png)
 > Users can continue chatting with the AI, for example, by asking for a table. We have a preview button to show an image of the mentioned location or open a new tab to view the location on Google for more details and reviews.
 <br/>
 <br/>
-![chat-preview](./screenshot/chatpreview.png)
+![chat-preview](https://raw.githubusercontent.com/ayusudi/hangout-ai/main/screenshot/chatpreview.png)
 
 ## List Tech Stack
 - React JS
@@ -40,6 +40,7 @@ Table of contents
 - React Flowbite
 - React MArkdown 
 - Google Oauth 
+- Firebase Google Analytic
 - Vercel 
 
 ## How To Run 
@@ -56,6 +57,7 @@ VITE_GMAP=
 VITE_PUBLIC_KEY_TIDB=
 VITE_PRIVATE_KEY_TIDB=
 VITE_YOUTUBE=
+VITE_FIREBASE_API_KEY=
 ```
 4. Run the code with this command line
 ```bash
