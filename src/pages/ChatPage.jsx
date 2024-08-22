@@ -1,6 +1,5 @@
-import pink from "../assets/bulletpink.png"
-import blue from "../assets/bulletblue.png"
 import { useEffect, useState } from "react";
+import saveIt from "../helpers/saveIt";
 import NavBarChat from "../components/NavBarChat"
 import background from "../assets/background.png";
 import jakarta from "../assets/jakarta.png";
@@ -8,6 +7,7 @@ import kualalumpur from "../assets/kualalumpur.png";
 import singapore from "../assets/singapore.png";
 import ModalForm from "../components/ModalForm";
 import formatDate from "../helpers/formatDate";
+import getPreview from "../helpers/serverless"
 import axios from "axios";
 import { Button } from "flowbite-react";
 import Markdown from 'react-markdown'
@@ -22,6 +22,8 @@ let defaultMessage = [
 export default function Page() {
   let text = "Loading.. Loading.. Loading.."
   let [chatId, setChatId] = useState('')
+  const [openPreview, setPreview] = useState(false)
+  const [dataPreview, setDataPreview] = useState([])
   const [loadingPanel, setLoadingPanel] = useState(false)
   const [loadingList, setLoadingList] = useState(false)
   const [isLoadingChat, setIsLoading] = useState(false)
@@ -46,6 +48,8 @@ export default function Page() {
 
   const fetchChatId = async (id) => {
     try {
+      setPreview(false)
+      setDataPreview([])
       let response = await axios({
         method: "GET",
         url: "https://hangout-ai-c81439a5ea16.herokuapp.com/chats/" + id,
@@ -63,6 +67,7 @@ export default function Page() {
         address: data.address,
         latlng: data.latlng
       })
+
       setChatId(id)
     } catch (error) {
     }
@@ -79,8 +84,6 @@ export default function Page() {
       setLoadingPanel(false)
     }
   }
-
-
   const fetchListChat = async () => {
     try {
       setLoadingList(true)
@@ -113,19 +116,6 @@ export default function Page() {
     } finally {
       setLoadingList(false)
     }
-  }
-
-  let saveIt = async (id, messages) => {
-    let res = await axios({
-      method: "POST",
-      url: "https://hangout-ai-c81439a5ea16.herokuapp.com/chats/" + id,
-      headers: {
-        access_token: localStorage.getItem("access_token")
-      },
-      data: {
-        messages
-      }
-    })
   }
   const chat = async (e) => {
     e.preventDefault()
@@ -182,6 +172,32 @@ export default function Page() {
       setLoadingPanel(false)
     } catch (error) {
     }
+  }
+
+  const preview = async (metadata) => {
+    let cid_array = metadata.map(el => el.cid)
+    let data = await getPreview(cid_array)
+    setPreview(true)
+    let dataFormat = data.map(el => {
+      const temp = JSON.parse(el.images).slice(0, 3)
+      return { ...el, images: temp }
+    })
+    setDataPreview(dataFormat)
+  }
+
+  const newTab = async (metadata) => {
+    let cid_array = metadata.map(el => el.cid)
+    let data = await getPreview(cid_array)
+    data.forEach((el, index) => {
+      console.log(el.link);
+      setTimeout(() => {
+        window.open(el.link, '_blank');
+      }, index * 500); // Delay each tab by 500ms
+    })
+  }
+
+  const remove = (e) => {
+    e.target.hidden = true
   }
 
   useEffect(() => {
@@ -304,15 +320,31 @@ export default function Page() {
                             {
                               el.metadata && (
                                 <div className="ml-4 p-3 border-s-4 mt-3 mb-4">
-                                  <b className="!text-[#359DA6]">Metionable :</b>
+                                  <b className="!text-[#A3E8EB]">Metionable :</b>
                                   <ul className="my-1">
                                     {
                                       el.metadata.map((el, j) => <li key={j}>- {el.name}</li>)
                                     }
                                   </ul>
-                                  <div className="flex gap-2">
-                                    <Button outline gradientDuoTone="cyanToBlue" className="mt-2">Open Preview</Button>
-                                    <Button outline gradientDuoTone="cyanToBlue" className="mt-2">Open New Tab</Button>
+                                  <div className="flex flex-col md:flex-row gap-3 md:gap-2 w-4/6 py-2 md:py-0">
+                                    <Button onClick={() => preview(el.metadata)} outline gradientDuoTone="cyanToBlue" className="sm:mt-0 md:mt-2">Open Preview</Button>
+                                    <Button onClick={() => newTab(el.metadata)} outline gradientDuoTone="cyanToBlue" className="sm:mt-0 md:mt-2 ">Open New Tab</Button>
+                                  </div>
+                                  <div className="pt-5 ">
+                                    {
+                                      dataPreview.map(el => {
+                                        let { title, images } = el
+                                        return (
+                                          <div key={el.cid} className="text-white mb-2">
+                                            <p>{title} ({el.category})</p>
+                                            <div className="overflow-x-scroll flex h-44 sm:w-[300px] md:w-[96%]">
+                                              {images.map(e => <img key={e.title} src={e.image} alt={e.title} onError={remove} />)}
+                                            </div>
+
+                                          </div>
+                                        )
+                                      })
+                                    }
                                   </div>
                                 </div>
                               )
@@ -335,13 +367,13 @@ export default function Page() {
                   }
                 </div>
               ) : (
-                <div className="flex flex-col justify-center items-center p-6 text-white flex-grow">
+                <div className="m-auto flex flex-col justify-center items-center p-2 md:p-6 text-white flex-grow">
                   <div className="flex flex-col justify-center border-gradient loading-container m-auto text-xl">
                     <div className="flex justify-center loading-container font-conthrax p-4">
                       {text.split('').map((letter, index) => (
                         <span
                           key={index}
-                          className="letter font-conthrax"
+                          className="letter text-sm md:text-2xl font-conthrax"
                           style={{ animationDelay: `${index * 0.04}s` }} // Stagger the animation for each letter
                         >
                           {letter}
@@ -417,10 +449,7 @@ export default function Page() {
             </div>
           </div>
         </div>
-
       </div >
-
-      {/* Footer */}
       < footer className="md:hidden mt-8 text-center text-white text-sm" >
         & copy; 2024 Hangout AI.All rights reserved.
       </footer >
