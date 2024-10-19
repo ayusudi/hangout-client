@@ -1,26 +1,29 @@
 @font-face {
-  font-family: 'Myriad Pro Regular';
+  font-family: "Myriad Pro Regular";
   font-style: normal;
   font-weight: normal;
-  src: local('Myriad Pro Regular'), url('./fonts/MYRIADPRO-REGULAR.woff') format('woff');
+  src: local("Myriad Pro Regular"),
+    url("./fonts/MYRIADPRO-REGULAR.woff") format("woff");
 }
 
 @font-face {
-  font-family: 'Myriad Pro Light';
+  font-family: "Myriad Pro Light";
   font-style: normal;
   font-weight: normal;
-  src: local('Myriad Pro Light'), url('./fonts/MyriadPro-Light.woff') format('woff');
+  src: local("Myriad Pro Light"),
+    url("./fonts/MyriadPro-Light.woff") format("woff");
 }
 
 @font-face {
-  font-family: 'Myriad Pro Bold';
+  font-family: "Myriad Pro Bold";
   font-style: normal;
   font-weight: normal;
-  src: local('Myriad Pro Bold'), url('./fonts/MYRIADPRO-BOLD.woff') format('woff');
+  src: local("Myriad Pro Bold"),
+    url("./fonts/MYRIADPRO-BOLD.woff") format("woff");
 }
 
 @font-face {
-  font-family: 'Conthrax';
+  font-family: "Conthrax";
   src: url("./fonts/conthrax-sb.otf") format("opentype");
 }
 
@@ -33,7 +36,6 @@
 }
 
 @keyframes bounce {
-
   0%,
   100% {
     transform: translateY(0);
@@ -41,5 +43,31 @@
 
   50% {
     transform: translateY(-100px);
+  }
+}
+
+/* Ensure dropdown options are visible above other content */
+.select-dropdown {
+  position: relative;
+  z-index: 50;
+}
+
+/* Ensure the select input is properly sized */
+.select-dropdown select {
+  width: 100%; /* Full width */
+  height: 40px; /* Adjust height for better interaction */
+  font-size: 16px; /* Adjust font size */
+  appearance: none; /* Remove native dropdown styles if needed */
+}
+
+/* Handle dropdown options size and positioning */
+.select-dropdown select:focus {
+  outline: none;
+}
+
+/* Optional: Handle mobile styles */
+@media (min-width: 768px) {
+  .select-dropdown {
+    display: none; /* Hide dropdown on desktop sizes */
   }
 }
